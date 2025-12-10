@@ -172,8 +172,25 @@ app.post('/api/gemini', async (req, res) => {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    // If API key is not configured, provide a helpful mock in development
     if (!apiKey) {
-      return res.status(500).json({ error: 'API key not configured on server' });
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(500).json({ error: 'API key not configured on server' });
+      }
+      // Development fallback: return a canned response so the UI can function
+      const mockText = 'Respuesta simulada de Gemini (modo desarrollo): No se proporcionó la API key. Aquí va un breve análisis de ejemplo. 🚜📈\\n\\n- Oportunidad: ajustar descuentos en líneas con mayor rotación.\\n- Recomendación: priorizar margen sobre volumen en fertilizantes.';
+      // record metric for mocked response
+      const totalDurationMs = Number(process.hrtime.bigint() - req._timings.start) / 1e6;
+      pushMetric({
+        id: req.requestId,
+        path: req.path,
+        promptLength: (prompt && prompt.length) || 0,
+        upstreamStatus: 200,
+        upstreamDurationMs: 0,
+        totalDurationMs: Math.round(totalDurationMs * 100) / 100,
+        timestamp: Date.now(),
+      });
+      return res.json({ text: mockText });
     }
 
     const body = {

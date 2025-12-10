@@ -217,7 +217,7 @@ const PricingDashboard = () => {
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                 <h3 className="text-lg font-bold mb-4 text-slate-800">Descuento Promedio por Línea (%)</h3>
                 <div className="h-80 w-full">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                  <ResponsiveContainer width="100%" height={300} debounce={50}>
                     <BarChart data={SUMMARY_DATA.slice(0, 10)} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                       <XAxis type="number" domain={[0, 25]} hide />
@@ -240,7 +240,7 @@ const PricingDashboard = () => {
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                 <h3 className="text-lg font-bold mb-4 text-slate-800">Dispersión de Precios (Menudeo vs Mayoreo 3)</h3>
                 <div className="h-80 w-full">
-                  <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
+                  <ResponsiveContainer width="100%" height={300} debounce={50}>
                     <LineChart data={SUMMARY_DATA.slice(0, 15)}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="linea" tick={false} />
