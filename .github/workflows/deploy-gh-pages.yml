@@ -35,6 +35,34 @@ jobs:
         run: npm run build
         working-directory: ./pricing-dashboard
 
+      - name: Publish build into `main` root (overwrite static files)
+        # This step commits the built `pricing-dashboard/dist` into the repository root on `main`.
+        # It allows Pages (configured to `main` root) to serve the new build without API calls.
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy built assets to repo root and push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          echo "Copying pricing-dashboard/dist -> repo root"
+          # remove previous static artifacts safely
+          rm -rf index.html assets vite.svg .nojekyll || true
+          cp -a pricing-dashboard/dist/. .
+          # ensure .nojekyll exists to prevent Jekyll processing
+          touch .nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(ci): publish build to main root"
+            git push origin HEAD:main
+          fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
