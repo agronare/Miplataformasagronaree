@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  pricing-dashboard:
+    build: .
+    image: pricing-dashboard:latest
+    ports:
+      - "80:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - METRICS_FILE=/app/metrics.jsonl
+      # Set GEMINI_API_KEY in a secure way in your environment or via secrets
+    restart: unless-stopped
