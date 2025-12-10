@@ -41,7 +41,7 @@ const CopilotChat = () => {
     if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       role: 'user',
       content: inputValue.trim(),
       timestamp: new Date()
@@ -60,10 +60,14 @@ const CopilotChat = () => {
         body: JSON.stringify({ prompt })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: data?.text || 'Lo siento, no pude procesar tu solicitud. Por favor, intenta de nuevo.',
         timestamp: new Date()
@@ -73,7 +77,7 @@ const CopilotChat = () => {
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: 'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.',
         timestamp: new Date()
