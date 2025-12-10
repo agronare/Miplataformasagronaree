@@ -1,0 +1,51 @@
+name: Deploy to Cloud Run
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+
+      - name: Configure Docker authentication
+        run: |-
+          gcloud auth configure-docker --quiet
+
+      - name: Build and push container image
+        env:
+          IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.IMAGE_NAME }}
+        run: |
+          IMAGE=gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.IMAGE_NAME:-pricing-dashboard }}:${{ github.sha }}
+          docker build -t $IMAGE .
+          docker push $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ secrets.CLOUD_RUN_SERVICE }} \
+            --image "$IMAGE" \
+            --region ${{ secrets.CLOUD_RUN_REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --project ${{ secrets.GCP_PROJECT }}
+
+      - name: Output service URL
+        run: |
+          URL=$(gcloud run services describe ${{ secrets.CLOUD_RUN_SERVICE }} --region ${{ secrets.CLOUD_RUN_REGION }} --format='value(status.url)')
+          echo "Service URL: $URL"
+          echo "url=$URL" >> $GITHUB_OUTPUT
