@@ -35,13 +35,6 @@ jobs:
         run: npm run build
         working-directory: ./pricing-dashboard
 
-      - name: Publish build into `main` root (overwrite static files)
-        # This step commits the built `pricing-dashboard/dist` into the repository root on `main`.
-        # It allows Pages (configured to `main` root) to serve the new build without API calls.
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Copy built assets to repo root and push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
