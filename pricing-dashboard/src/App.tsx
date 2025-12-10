@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Search, Package, TrendingDown, DollarSign, Filter, LayoutGrid, List, Sparkles } from 'lucide-react';
 import AIInsightWidget from './components/AIInsightWidget';
+import CopilotChat from './components/CopilotChat';
 
 // Tipos compartidos
 type SummaryItem = {
@@ -442,6 +443,9 @@ const PricingDashboard = () => {
           onClose={() => setSelectedProductForPitch(null)}
         />
       )}
+
+      {/* Copilot Chat Widget */}
+      <CopilotChat />
 
     </div>
   );
